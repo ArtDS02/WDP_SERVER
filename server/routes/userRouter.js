@@ -63,7 +63,12 @@ userRouter.get("/:userId", authenticate.verifyUser, (req, res, next) => {
       if (user) {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
-        res.json(user);
+        res.json({
+          fullname: user.fullname,
+          username: user.username,
+          email: user.email,
+          DOB: user.DOB
+        });
       } else {
         res.statusCode = 404;
         res.setHeader("Content-Type", "application/json");
