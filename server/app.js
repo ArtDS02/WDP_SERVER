@@ -10,7 +10,6 @@ const config = require('./config');
 const userRouter = require('./routes/userRouter');
 const collectionRouter = require('./routes/collectionRouter');
 const questionRouter = require('./routes/questionRouter');
-const questionConnectRouter = require('./routes/collectionConnectRouter');
 const examRouter = require('./routes/examRouter');
 //Chưa check
 const enrollmentRouter = require('./routes/enrollmentRouter');
@@ -49,9 +48,7 @@ app.use(cors());
 app.use('/users', userRouter);
 app.use('/collections', collectionRouter);
 app.use('/question', questionRouter);
-app.use('/questionConnect', questionConnectRouter);
 app.use('/exam', examRouter);
-// Chưa check
 app.use('/enrollment', enrollmentRouter);
 
 app.listen(port, () => {

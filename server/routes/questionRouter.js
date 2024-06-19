@@ -80,4 +80,15 @@ questionRouter.delete('/:id', authenticate.verifyUser, (req, res, next) => {
     .catch(err => next(err));
 });
 
+// Route to add a list of questions
+questionRouter.post('/addListQuestion', authenticate.verifyUser, (req, res, next) => {
+  Question.insertMany(req.body)
+    .then(questions => {
+      res.statusCode = 201;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(questions);
+    })
+    .catch(err => next(err));
+});
+
 module.exports = questionRouter;

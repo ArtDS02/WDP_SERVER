@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const collectionSchema = new Schema({
   userId: {
     type: String,
-    required: true  
+    required: true
   },
   name: {
     type: String,
@@ -12,12 +12,16 @@ const collectionSchema = new Schema({
   },
   numberOfQuestion: {
     type: Number,
-    default: ''
+    default: 0
   },
   price: {
     type: Number,
     default: 0
-  }
+  },
+  questions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Question' 
+  }]
 });
 
 module.exports = mongoose.model('Collection', collectionSchema);
