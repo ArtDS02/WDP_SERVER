@@ -107,4 +107,22 @@ userRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res
     .catch((err) => next(err));
 });
 
+
+// Route to delete a users by ID //Done
+userRouter.delete('/:id', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+  User.findByIdAndDelete(req.params.id)
+    .then(question => {
+      if (question) {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({ success: true, message: 'User deleted' });
+      } else {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({ error: 'Question not found' });
+      }
+    })
+    .catch(err => next(err));
+});
+
 module.exports = userRouter;
