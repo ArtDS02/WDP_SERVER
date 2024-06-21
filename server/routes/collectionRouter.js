@@ -39,12 +39,12 @@ collectionRouter.get('/', authenticate.verifyUser, async (req, res, next) => {
   }
 });
 
-// Route to get a specific collection by QuestionId //Done
+// Route to delete a question in every collections contain it by QuestionId //Done
 collectionRouter.delete('/deleteQuestion/:questionId', authenticate.verifyUser, async (req, res, next) => {
   const { questionId } = req.params;
 
   try {
-    // Tìm và xóa questionId khỏi mảng questions
+    
     const result = await Collection.updateMany(
       { questions: questionId },
       { $pull: { questions: questionId } }
@@ -56,7 +56,7 @@ collectionRouter.delete('/deleteQuestion/:questionId', authenticate.verifyUser, 
     
     res.status(200).send(`Removed questionId: ${questionId} from ${result.modifiedCount} collections`);
   } catch (error) {
-    next(error); // Sử dụng next để chuyển lỗi tới middleware xử lý lỗi
+    next(error); 
   }
 });
 
