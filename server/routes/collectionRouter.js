@@ -63,7 +63,7 @@ collectionRouter.delete('/deleteQuestion/:questionId', authenticate.verifyUser, 
 // Route to get a specific collection by ID  //Done
 collectionRouter.get('/:id', authenticate.verifyUser, async (req, res, next) => {
   try {
-    const collection = await Collection.findOne({ userId: req.user._id, _id: req.params.id })
+    const collection = await Collection.findOne({ _id: req.params.id })
       .populate('questions'); 
     if (collection) {
       res.statusCode = 200;
@@ -74,6 +74,19 @@ collectionRouter.get('/:id', authenticate.verifyUser, async (req, res, next) => 
       res.setHeader('Content-Type', 'application/json');
       res.json({ error: 'Collection not found or unauthorized access' });
     }
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Route to get all collections by the current user // New Route
+collectionRouter.get('/mycollections', authenticate.verifyUser, async (req, res, next) => {
+  try {
+    const collections = await Collection.find({ userId: req.user._id })
+      .populate('questions');
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json(collections);
   } catch (err) {
     next(err);
   }
