@@ -26,8 +26,8 @@ collectionRouter.post('/', authenticate.verifyUser, async (req, res, next) => {
   }
 });
 
-// Route to get all collections (only for admin)  //Done
-collectionRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, async (req, res, next) => {
+// Route to get all collections //Done
+collectionRouter.get('/', authenticate.verifyUser, async (req, res, next) => {
   try {
     const collections = await Collection.find({})
       .populate('questions'); 
@@ -36,6 +36,27 @@ collectionRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, asy
     res.json(collections);
   } catch (err) {
     next(err);
+  }
+});
+
+// Route to get a specific collection by QuestionId //Done
+collectionRouter.delete('/deleteQuestion/:questionId', authenticate.verifyUser, async (req, res, next) => {
+  const { questionId } = req.params;
+
+  try {
+    // Tìm và xóa questionId khỏi mảng questions
+    const result = await Collection.updateMany(
+      { questions: questionId },
+      { $pull: { questions: questionId } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).send('No collections found with the given questionId or questionId not found in any collection');
+    }
+    
+    res.status(200).send(`Removed questionId: ${questionId} from ${result.modifiedCount} collections`);
+  } catch (error) {
+    next(error); // Sử dụng next để chuyển lỗi tới middleware xử lý lỗi
   }
 });
 
