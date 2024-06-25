@@ -27,6 +27,10 @@ const userSchema = new Schema({
     type:Number,
     default:0
   },
+  favoriteCollection: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Collection' 
+  }],
   admin: {
     type: Boolean,
     default: false

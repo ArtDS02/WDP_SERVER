@@ -2,27 +2,45 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Collection = require('../models/collection');
 const authenticate = require('../authen/authenticate');
+const Question = require('../models/question');
 
 const collectionRouter = express.Router();
 collectionRouter.use(bodyParser.json());
 
-// Route to create a new collection  //Done
-collectionRouter.post('/', authenticate.verifyUser, async (req, res, next) => {
-  const newCollection = new Collection({
-    userId: req.user._id,
-    name: req.body.name,
-    numberOfQuestion: req.body.numberOfQuestion,
-    price: req.body.price,
-    questions: req.body.questions 
-  });
-
+// Route to get all collections by the current user // New Route
+collectionRouter.get('/mycollections', authenticate.verifyUser, async (req, res, next) => {
   try {
-    const savedCollection = await newCollection.save();
-    res.statusCode = 201;
+    const collections = await Collection.find({ userId: req.user._id })
+      .populate('questions');
+    res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.json(savedCollection);
+    res.json(collections);
   } catch (err) {
     next(err);
+  }
+});
+
+// Route to create a new collection  //Done
+collectionRouter.post('/', authenticate.verifyUser, async (req, res, next) => {
+  try {
+    // Create question documents from the request body
+    const questionPromises = req.body.questions.map(question => new Question(question).save());
+    const questionDocs = await Promise.all(questionPromises);
+    const questionIds = questionDocs.map(question => question._id);
+
+    // Create the new collection document
+    const newCollection = new Collection({
+      userId: req.user ? req.user._id : null, // Assign userId if available, else set to null
+      name: req.body.name,
+      numberOfQuestion: req.body.numberOfQuestion,
+      price: req.body.price,
+      questions: questionIds
+    });
+
+    const savedCollection = await newCollection.save();
+    res.status(201).json(savedCollection);
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -74,19 +92,6 @@ collectionRouter.get('/:id', authenticate.verifyUser, async (req, res, next) => 
       res.setHeader('Content-Type', 'application/json');
       res.json({ error: 'Collection not found or unauthorized access' });
     }
-  } catch (err) {
-    next(err);
-  }
-});
-
-// Route to get all collections by the current user // New Route
-collectionRouter.get('/mycollections', authenticate.verifyUser, async (req, res, next) => {
-  try {
-    const collections = await Collection.find({ userId: req.user._id })
-      .populate('questions');
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.json(collections);
   } catch (err) {
     next(err);
   }

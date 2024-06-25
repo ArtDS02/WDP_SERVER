@@ -11,9 +11,10 @@ const userRouter = require('./routes/userRouter');
 const collectionRouter = require('./routes/collectionRouter');
 const questionRouter = require('./routes/questionRouter');
 const examRouter = require('./routes/examRouter');
-//Chưa check
+const depositRouter = require('./routes/depositRouter');
 const enrollmentRouter = require('./routes/enrollmentRouter');
 
+//Chưa check
 
 const app = express();
 app.use(bodyParser.json());
@@ -50,6 +51,9 @@ app.use('/collections', collectionRouter);
 app.use('/question', questionRouter);
 app.use('/exam', examRouter);
 app.use('/enrollment', enrollmentRouter);
+
+// Mới
+app.use('/deposit', depositRouter);
 
 app.listen(port, () => {
     console.log(`Server is running with port ${port}`);

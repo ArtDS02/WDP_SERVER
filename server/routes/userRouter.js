@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const User = require('../models/user');
+const mongoose = require('mongoose'); // Import Mongoose
 const passport = require('passport');
 const authenticate = require('../authen/authenticate');
 
@@ -67,7 +68,8 @@ userRouter.get("/:userId", authenticate.verifyUser, (req, res, next) => {
           fullname: user.fullname,
           username: user.username,
           email: user.email,
-          DOB: user.DOB
+          DOB: user.DOB,
+          favoriteCollection: user.favoriteCollection
         });
       } else {
         res.statusCode = 404;
@@ -128,6 +130,56 @@ userRouter.delete('/:id', authenticate.verifyUser, authenticate.verifyAdmin, (re
       }
     })
     .catch(err => next(err));
+});
+
+// Router to add favorite collection
+userRouter.post('/:userId/addCollection', authenticate.verifyUser, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { collectionId } = req.body;
+
+    if (!collectionId || !mongoose.Types.ObjectId.isValid(collectionId)) {
+      return res.status(400).json({ error: 'Valid CollectionID is required' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!Array.isArray(user.favoriteCollection)) {
+      user.favoriteCollection = [];
+    }
+
+    if (!user.favoriteCollection.includes(collectionId)) {
+      user.favoriteCollection.push(collectionId);
+      await user.save();
+    }
+
+    res.status(200).json({ message: 'Collection added successfully', user });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'An error occurred', details: error.message });
+  }
+});
+
+// Router to get all favorite Collection
+userRouter.get('/:userId/favoriteCollections', authenticate.verifyUser, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await User.findById(userId).populate('favoriteCollection');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ favoriteCollections: user.favoriteCollection });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'An error occurred', details: error.message });
+  }
 });
 
 module.exports = userRouter;
