@@ -48,7 +48,7 @@ app.use(cors());
 // Routes
 app.use('/users', userRouter);
 app.use('/collections', collectionRouter);
-app.use('/question', questionRouter);
+app.use('/questions', questionRouter);
 app.use('/exam', examRouter);
 app.use('/enrollment', enrollmentRouter);
 

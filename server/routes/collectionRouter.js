@@ -4,6 +4,7 @@ const Collection = require('../models/collection');
 const authenticate = require('../authen/authenticate');
 const Question = require('../models/question');
 
+
 const collectionRouter = express.Router();
 collectionRouter.use(bodyParser.json());
 
@@ -41,6 +42,32 @@ collectionRouter.post('/', authenticate.verifyUser, async (req, res, next) => {
     res.status(201).json(savedCollection);
   } catch (error) {
     next(error);
+  }
+});
+
+// Route để thêm collection mới (dùng cho add file)
+collectionRouter.post('/addCollection', async (req, res) => {
+  const { userId, name, numberOfQuestion, price, questions } = req.body;
+
+  try {
+    // Tạo một instance của Collection
+    const newCollection = new Collection({
+      userId,
+      name,
+      numberOfQuestion,
+      price,
+      questions
+    });
+
+    // Lưu collection vào cơ sở dữ liệu
+    const savedCollection = await newCollection.save();
+
+    // Trả về response thành công
+    res.status(201).json(savedCollection);
+  } catch (err) {
+    // Xử lý lỗi nếu có
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi server, không thể thêm collection' });
   }
 });
 
